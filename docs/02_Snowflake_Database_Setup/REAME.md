@@ -573,33 +573,33 @@ The Snowflake database objects are organized into separate SQL scripts based on 
 
 ## 🧱 Raw Layer
 
-| Script | Description |
-|--------|-------------|
-| [📘 `create_raw_tables.sql`](../../snowflake/02_raw/create_raw_tables.sql) | Creates raw-layer tables for storing ingested source data |
+| Script                                                                           | Description |
+|----------------------------------------------------------------------------------|-------------|
+| [📘 `01_create_raw_tables.sql`](../../snowflake/02_raw/01_create_raw_tables.sql) | Creates raw-layer tables for storing ingested source data |
 
 ---
 
 ## 🏗️ Core Layer
 
-| Script | Description |
-|--------|-------------|
-| [📘 `create_core_tables.sql`](../../snowflake/03_core/create_core_tables.sql) | Creates core tables used for structured and standardized data |
+| Script                                                                              | Description |
+|-------------------------------------------------------------------------------------|-------------|
+| [📘 `01_create_core_tables.sql`](../../snowflake/03_core/01_create_core_tables.sql) | Creates core tables used for structured and standardized data |
 
 ---
 
 ## 📐 Dimension Layer
 
-| Script | Description |
-|--------|-------------|
-| [📘 `create_dimension_tables.sql`](../../snowflake/04_dimension/create_dimension_tables.sql) | Creates dimension tables used for analytical processing |
+| Script                                                                                             | Description |
+|----------------------------------------------------------------------------------------------------|-------------|
+| [📘 `01_create_dimension_tables.sql`](../../snowflake/04_dimension/01_create_dimension_tables.sql) | Creates dimension tables used for analytical processing |
 
 ---
 
 ## 📊 Fact Layer
 
-| Script | Description |
-|--------|-------------|
-| [📘 `create_fact_tables.sql`](../../snowflake/05_fact/create_fact_tables.sql) | Creates fact tables containing measurable business events and metrics |
+| Script                                                                              | Description |
+|-------------------------------------------------------------------------------------|-------------|
+| [📘 `01_create_fact_tables.sql`](../../snowflake/05_fact/01_create_fact_tables.sql) | Creates fact tables containing measurable business events and metrics |
 ---
 
 # 🎯 Key Takeaways
