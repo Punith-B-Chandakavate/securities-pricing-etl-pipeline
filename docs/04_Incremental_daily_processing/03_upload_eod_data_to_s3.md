@@ -1,14 +1,3 @@
-Yes. For `03_upload_eod_data_to_s3.md`, I would document the **Airflow task that takes the locally generated EOD CSV and uploads it to the S3 Bronze layer**.
-
-Use this file:
-
-```text
-docs/04_Incremental_daily_processing/03_upload_eod_data_to_s3.md
-```
-
-Here is the complete Markdown:
-
-````markdown
 # ☁️ Upload EOD Data to AWS S3
 
 ![AWS S3](https://img.shields.io/badge/AWS%20S3-Object%20Storage-FF9900?logo=amazonaws&logoColor=white)
