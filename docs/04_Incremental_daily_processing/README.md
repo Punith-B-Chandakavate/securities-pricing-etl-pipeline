@@ -1,7 +1,7 @@
 # 🔄 Incremental Daily Processing
 
-This section documents the automated daily EOD securities data
-ingestion pipeline using Apache Airflow.
+This section documents the automated daily EOD securities pricing
+pipeline using Apache Airflow, AWS S3, and Snowflake.
 
 ## 📚 Documentation
 
@@ -11,26 +11,40 @@ ingestion pipeline using Apache Airflow.
 
 Covers:
 
-- Airflow DAG creation
-- Massive API integration
-- Airflow Variables
+- Airflow DAG
+- Massive API
 - EOD data download
+- Airflow Variables
 - XCom
-- Local CSV validation
-- Retry configuration
 - Task dependencies
-- DAG scheduling
-- Error handling
+- Retry handling
+- Local CSV validation
 
-## 🔄 Pipeline
+### 2. AWS S3 & Airflow Connection
+
+[`02_aws_s3_airflow_connection.md`](02_aws_s3_airflow_connection.md)
+
+Covers:
+
+- AWS S3 bucket
+- IAM user
+- S3 permissions
+- AWS access keys
+- Airflow AWS connection
+- `aws_default`
+- S3 connectivity
+
+## 🔄 Incremental Pipeline
 
 ```text
 Massive API
      ↓
 Apache Airflow
      ↓
-Download EOD Data
+Download EOD CSV
      ↓
-CSV
+Amazon S3
      ↓
-Verify File
+Snowflake
+     ↓
+RAW → CORE → DIM → FACT
