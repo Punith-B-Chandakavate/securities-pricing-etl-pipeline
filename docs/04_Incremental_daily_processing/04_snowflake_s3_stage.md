@@ -1,8 +1,8 @@
 # 🔐 AWS IAM Role for Snowflake S3 Integration
 
-![AWS](https://img.shields.io/badge/AWS-IAM-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)
-![S3](https://img.shields.io/badge/Amazon-S3-569A31?style=for-the-badge&logo=amazons3&logoColor=white)
-![Snowflake](https://img.shields.io/badge/Snowflake-Integration-29B5E8?style=for-the-badge&logo=snowflake&logoColor=white)
+![AWS S3](https://img.shields.io/badge/AWS%20S3-Object%20Storage-FF9900?logo=amazonaws&logoColor=white)
+![AWS IAM](https://img.shields.io/badge/AWS%20IAM-Access%20Management-FF9900?logo=amazonaws&logoColor=white)
+![Snowflake](https://img.shields.io/badge/Snowflake-Storage%20Integration-29B5E8?logo=snowflake&logoColor=white)
 
 > Configure an AWS IAM Role and establish the trust relationship required for Snowflake to access Amazon S3.
 
