@@ -456,6 +456,14 @@ For production, prefer a restricted IAM policy allowing only the required operat
 
 ---
 
+# 📁 Related Source Files
+
+| Resource | Link |
+|----------|------|
+| 🌀 AWS S3 Connection Test DAG | [`test_aws_s3_connection.py`](../../airflow/dags/test_aws_s3_connection.py) |
+
+---
+
 # 🎯 Key Takeaways
 
 * ☁️ **Amazon S3** provides cloud object storage for EOD files.
