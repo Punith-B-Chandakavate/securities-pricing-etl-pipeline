@@ -5,6 +5,7 @@ import pendulum
 from airflow import DAG
 from airflow.models import Variable
 from airflow.providers.standard.operators.python import PythonOperator
+from airflow.providers.amazon.aws.transfers.local_to_s3 import LocalFilesystemToS3Operator
 from airflow.sdk.exceptions import AirflowFailException
 
 from lib.eod_data_downloader import download_massive_eod_data_to_csv
@@ -20,6 +21,7 @@ DEFAULT_ARGS = {"owner": "data-eng",  # Owner of the DAG
 # Setup basic configurations for Polygon API
 MASSIVE_API_KEY = Variable.get("MASSIVE_API_KEY")   #API Key for Polygon.io to access market data
 MASSIVE_MAX_LOOKBACK_DAYS = int(Variable.get("LOOKBACK_DAYS", default_var="10"))  # Maximum number of days
+S3_BUCKET = Variable.get("S3_BUCKET")
 
 TEMPLATE_SEARCHPATH = [os.path.join(os.path.dirname(__file__), "sql")]
 
@@ -80,4 +82,17 @@ with DAG(
                 task_id="t02_verify_local_file",
                 python_callable=verify_file_exists)
 
-    download >> verify_file
+    # Step 3: Upload to S3
+    upload_file = LocalFilesystemToS3Operator(
+        task_id="t03_upload_to_s3",
+        filename="/tmp/eod_{{ti.xcom_pull(task_ids='t01_download_to_csv', key='trading_date')}}.csv",
+        dest_bucket=S3_BUCKET, # S3 bucket where the file will be uploaded
+        dest_key=(
+            "market/bronze/eod/"
+            "eod_prices_{{ ti.xcom_pull(task_ids='t01_download_to_csv', key='trading_date') }}.csv"
+        ),
+        aws_conn_id="aws_default",  # AWS connection ID to fetch credentials
+        replace=True,  # Replace the file if it already exists in S3
+    )
+
+    download >> verify_file >> upload_file
