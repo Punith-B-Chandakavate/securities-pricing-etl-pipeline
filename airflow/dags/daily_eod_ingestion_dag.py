@@ -4,9 +4,13 @@ import pendulum
 
 from airflow import DAG
 from airflow.models import Variable
+from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
 from airflow.providers.standard.operators.python import PythonOperator
 from airflow.providers.amazon.aws.transfers.local_to_s3 import LocalFilesystemToS3Operator
+from airflow.sdk import TaskGroup
 from airflow.sdk.exceptions import AirflowFailException
+from airflow.providers.snowflake.operators.snowflake import SnowflakeCheckOperator
+
 
 from lib.eod_data_downloader import download_massive_eod_data_to_csv
 
@@ -95,4 +99,40 @@ with DAG(
         replace=True,  # Replace the file if it already exists in S3
     )
 
-    download >> verify_file >> upload_file
+    # Step 4: Snowflake load
+    with TaskGroup(group_id="t04_snowflake_load") as snowflake_load:
+
+        params_common = {
+            "trading_ds_task_id": "t01_download_to_csv"
+        }
+
+        # S01: Load EOD CSV from S3 into RAW
+        copy_to_raw = SQLExecuteQueryOperator(
+            task_id="s01_copy_to_raw",
+            conn_id="snowflake_default",
+            sql="1. copy_to_raw.sql",
+            params=params_common,
+        )
+
+        # S02: Verify that the EOD data was successfully loaded
+        check_loaded = SnowflakeCheckOperator(
+            task_id="s02_check_eod_prices_exist",
+            sql="2. check_loaded.sql",
+            snowflake_conn_id="snowflake_default",
+            params=params_common,
+        )
+
+        # S03: Calculate metrics before RAW → CORE merge
+        premerge_metrics = SQLExecuteQueryOperator(
+            task_id="s03_compute_premerge_metrics",
+            conn_id="snowflake_default",
+            sql="3. premerge_metrics.sql",
+            params=params_common,
+        )
+
+        # Snowflake task dependencies
+        copy_to_raw >> check_loaded >> premerge_metrics
+
+
+    # Overall pipeline dependency
+    download >> verify_file >> upload_file >> snowflake_load
