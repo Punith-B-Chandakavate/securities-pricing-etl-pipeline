@@ -130,9 +130,49 @@ with DAG(
             params=params_common,
         )
 
-        # Snowflake task dependencies
-        copy_to_raw >> check_loaded >> premerge_metrics
+        # S04: MERGE RAW EOD DATA INTO CORE
+        merge_core = SQLExecuteQueryOperator(
+            task_id="s04_merge_core_eod",
+            conn_id="snowflake_default",
+            sql="4. merge_core.sql",
+            params=params_common,
+        )
 
+        # S05: MERGE SECURITY DIMENSION
+        merge_dim_security = SQLExecuteQueryOperator(
+            task_id="s05_merge_dim_security",
+            conn_id="snowflake_default",
+            sql="5. merge_dim_security.sql",
+            params=params_common,
+        )
+
+        # S06: MERGE DATE DIMENSION
+        merge_dim_date = SQLExecuteQueryOperator(
+            task_id="s06_merge_dim_date",
+            conn_id="snowflake_default",
+            sql="6. merge_dim_date.sql",
+            params=params_common,
+        )
+
+        # S07: MERGE DAILY PRICE FACT
+        merge_fact = SQLExecuteQueryOperator(
+            task_id="s07_merge_fact_daily_price",
+            conn_id="snowflake_default",
+            sql="7. merge_fact_daily_price.sql",
+            params=params_common,
+        )
+
+        # S08: COMPUTE POST-MERGE METRICS
+        postmerge = SQLExecuteQueryOperator(
+            task_id="s08_compute_postmerge_metrics",
+            conn_id="snowflake_default",
+            sql="8. postmerge_metrics.sql",
+            params=params_common,
+        )
+
+        # Snowflake task dependencies
+        copy_to_raw >> check_loaded >> premerge_metrics >> merge_core
+        merge_core >> [merge_dim_security, merge_dim_date] >> merge_fact >> postmerge
 
     # Overall pipeline dependency
     download >> verify_file >> upload_file >> snowflake_load
