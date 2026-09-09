@@ -1,7 +1,7 @@
 # 🔔 Slack Notifications with Apache Airflow
 
+![Slack](https://img.shields.io/badge/Slack-Incoming%20Webhooks-4A154B?logo=slack&logoColor=white)
 ![Apache Airflow](https://img.shields.io/badge/Apache%20Airflow-Notifications-017CEE?logo=apacheairflow&logoColor=white)
-![Slack](https://img.shields.io/badge/Slack-Incoming%20Webhook-4A154B?logo=slack&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-Airflow%20Integration-3776AB?logo=python&logoColor=white)
 
 > Configure Slack Incoming Webhooks and integrate them with Apache Airflow to receive EOD pipeline notifications and execution summaries.
