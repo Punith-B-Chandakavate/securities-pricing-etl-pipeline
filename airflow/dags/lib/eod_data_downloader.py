@@ -60,6 +60,23 @@ def download_massive_eod_data_to_csv(MASSIVE_API_KEY, LOOKBACK_DAYS):
                 for row in results:
                     w.writerow([trading_date] + [row.get(k, "") for k in fields])  # Write the trading day data
 
+                # --- Inject dummy stocks with negative volumes (for simulation) ---
+                dummy_rows = [
+                    [trading_date, "AAPL_X", 192.3, 195.6, 191.8, 194.1, -1500000],
+                    [trading_date, "GOOGL_X", 138.2, 140.5, 137.6, 139.8, -980000],
+                    [trading_date, "MSFT_X", 410.5, 415.2, 409.1, 412.4, -760000],
+                    [trading_date, "AMZN_X", 171.8, 175.0, 170.4, 174.2, -620000],
+                    [trading_date, "TSLA_X", 252.9, 258.3, 251.7, 257.5, -840000],
+                    [trading_date, "META_X", 465.7, 472.2, 463.8, 471.0, -540000],
+                    [trading_date, "NFLX_X", 600.1, 610.8, 598.5, 609.2, -430000],
+                    [trading_date, "NVDA_X", 1135.6, 1150.3, 1130.1, 1147.9, -890000],
+                    [trading_date, "INTC_X", 43.2, 44.0, 42.9, 43.8, -350000],
+                    [trading_date, "IBM_TEST", 185.7, 188.9, 184.8, 187.3, -270000],
+                ]
+
+                w.writerows(dummy_rows)
+                log.warning(f"[Injected] Added {len(dummy_rows)} dummy stocks with negative volumes for testing.")
+
             # Return the date for further use (if needed)
             return trading_date
         else:

@@ -21,6 +21,35 @@ USE SCHEMA CORE;
 -- before feeding it into the MERGE statement.
 ------------------------------------------------------------
 
+-- 1) Capture rejects (negative volume) idempotently
+------------------------------------------------------------
+MERGE INTO CORE.EOD_PRICES_REJECT rej
+USING (
+  SELECT
+	r.TRADE_DATE,
+    UPPER(TRIM(r.SYMBOL)) AS SYMBOL,
+    r.OPEN, r.HIGH, r.LOW, r.CLOSE, r.VOLUME,
+    'NEGATIVE_VOLUME'     AS REJECT_REASON,
+    r._SRC_FILE,
+    r._INGEST_TS
+  FROM SEC_PRICING.RAW.RAW_EOD_PRICES r
+  WHERE r.TRADE_DATE = TO_DATE('{{ ti.xcom_pull(task_ids=params.trading_ds_task_id, key="trading_date") }}')
+    AND r.VOLUME < 0
+) src
+ON rej.SYMBOL     = src.SYMBOL
+AND rej.TRADE_DATE = src.TRADE_DATE
+WHEN NOT MATCHED THEN INSERT (
+  TRADE_DATE, SYMBOL, OPEN, HIGH, LOW, CLOSE, VOLUME,
+  REJECT_REASON, _SRC_FILE, _INGEST_TS
+) VALUES (
+   src.TRADE_DATE, src.SYMBOL, src.OPEN, src.HIGH, src.LOW, src.CLOSE, src.VOLUME,
+  src.REJECT_REASON, src._SRC_FILE, src._INGEST_TS
+);
+
+
+-- 2) Upsert only valid (non-negative) rows into CORE
+------------------------------------------------------------
+
 MERGE INTO CORE.EOD_PRICES tgt
 USING (
   WITH src_raw AS (
@@ -32,6 +61,7 @@ USING (
       r._SRC_FILE                    -- deterministic tie-breaker if ingest_ts ties
     FROM RAW.RAW_EOD_PRICES r
     WHERE r.TRADE_DATE = TO_DATE('{{ ti.xcom_pull(task_ids=params.trading_ds_task_id, key="trading_date") }}')
+    AND r.VOLUME >= 0                          -- exclude rejects here
   ),
   ranked AS (
      -- Keep only ONE record per (SYMBOL, TRADE_DATE):
